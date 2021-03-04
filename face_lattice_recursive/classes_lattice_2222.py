@@ -19,6 +19,9 @@ all_polys[0] = [bell_polytope]
 
 def recursive_classes_lattice(level):
     """ Recursive construction of a classes face lattice """
+    if level > 2:
+        return True
+    print(level)
     if len(all_polys[level]) == 0:
         return True
     all_polys[level + 1] = []
@@ -26,9 +29,9 @@ def recursive_classes_lattice(level):
         if p.dims <= 0:
             continue
         # iterate through each face-class of this polytope
-        for c in p.get_all_classes():
+        for c in p.get_all_faces():
             # check if the class is equivalent under the bell polytope to already found polytopes
-            if not c.equiv_under_bell(all_polys[level + 1]):
+            if not c.subpolytope_equiv_under_bell(all_polys[level + 1]):
                 all_polys[level + 1].append(c)
     recursive_classes_lattice(level + 1)
 

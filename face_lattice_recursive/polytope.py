@@ -8,6 +8,7 @@ from linearbell.utils import equiv_check_adjacency_panda
 from bokeh.models import Circle, MultiLine, Range1d
 from bokeh.plotting import figure, from_networkx
 import networkx as nx
+import copy
 
 
 class Polytope():
@@ -162,6 +163,25 @@ class Polytope():
         assert self.initial_polytope == other.initial_polytope, 'Initial Polytope of both polytopes is not the same'
         return equiv_check_adjacency_panda(self.creating_face, other.creating_face, self.initial_polytope.relabellings,
                                            self.initial_polytope.deterministics)
+
+    def subpolytope_equiv_under_bell(self, other):
+        """ Checks if two polytopes are equivalent under the symmetry of the Bell Polytope """
+        if type(other) == list:
+            for o in other:
+                if self.subpolytope_equiv_under_bell(o):
+                    return o
+            return False
+        # check that the number of dimensions is the same
+        if self.dims != other.dims:
+            return False
+        if self.deterministics.shape[0] != other.deterministics.shape[0]:
+            return False
+        # take every relabelling and relabel one polytope and check if deterministics are the same
+        for r in self.initial_polytope.relabellings:
+            if np.all(self.deterministics == other.deterministics[:, r]):
+                print('equivalent')
+                return True
+        return False
 
     def get_valid_face(self, poss_face):
         """ Checks if a given face is a valid face """
